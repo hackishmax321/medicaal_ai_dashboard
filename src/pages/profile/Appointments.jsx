@@ -123,7 +123,7 @@ const Appointments = () => {
 
   const loadResources = async () => {
     if(role==='Doctor'){
-      await appointmentsService.getAppointmentsOfDoctor(id).then((data) => {
+      await appointmentsService.getAppointmentsOfDoctor(name).then((data) => {
         console.log(data)  
         setAppointments(data);
       })
