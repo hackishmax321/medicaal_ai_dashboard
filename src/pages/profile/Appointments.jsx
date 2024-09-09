@@ -203,19 +203,19 @@ const Appointments = () => {
                         <td className="border p-2">
                           <b>{appointment.userName}</b>
                           <br></br>
-                          <Link to={'/profile/medicalbook/'+appointment.user}><small>{appointment.user}</small></Link>
+                          <Link to={'/profile/medicalbook/'+appointment.patient}><small>{appointment.patient}</small></Link>
                         </td>
                         <td className="border p-2">
-                          {appointment.desc}
+                          {appointment.day} - {appointment.timeperiod}
                         </td>
                         <td className="border p-2">
                           <b>{appointment.selectedTime}</b>
                           <br></br>
-                          <small>{(new Date(appointment.selectedDate)).toLocaleDateString()}</small>
+                          <small>{(new Date(appointment.date)).toLocaleDateString()}</small>
                         </td>
                         <td className="border p-2">{appointment.verified?'Approved':'Not Approved'}</td>
                         {(role==='Doctor'||role==='Patient')&&<td className="border p-2 flex items-center justify-center">
-                            {appointment.verified === false && (
+                            {appointment.accepted === false && (
                             <>
                                 {role==='Doctor'&&<button
                                 className="bg-green text-white px-4 py-2 mr-2 rounded"
@@ -231,7 +231,7 @@ const Appointments = () => {
                                 </button>
                             </>
                             )}
-                            {appointment.verified === true && (
+                            {appointment.accepted === true && (
                             <>
                                 <button
                                 className="bg-shade text-white px-4 py-2 mr-2 rounded"
