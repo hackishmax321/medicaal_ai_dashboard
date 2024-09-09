@@ -21,7 +21,7 @@ class AppointmentsService {
 
     async getAppointmentsOfPatient(user){
         appointment_list = [];
-        await axios.get(path).then((response)=>{
+        await axios.get(`${path}/patient/${user}`).then((response)=>{
             
             response.data.forEach(doc=>{
                 if(user==doc.user)
@@ -33,7 +33,7 @@ class AppointmentsService {
 
     async getAppointmentsOfDoctor(user){
         appointment_list = [];
-        await axios.get(path).then((response)=>{
+        await axios.get(`${path}/doctor/${user}`).then((response)=>{
             
             response.data.forEach(doc=>{
                 if(user==doc.doctor)

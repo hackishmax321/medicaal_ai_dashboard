@@ -9,6 +9,7 @@ import Notiflix from 'notiflix';
 const Appointments = () => {
   const [username, setUsername] = useState(localStorage.getItem('username'));
   const [role, setRole] = useState(localStorage.getItem('role'));
+  const [name, setName] = useState(localStorage.getItem('name'));
   const [id, setID] = useState(localStorage.getItem('id'));
   const [user, setUser] = useState(null);
   const [appointments, setAppointments] = useState([]);
@@ -47,10 +48,10 @@ const Appointments = () => {
         'Yes',
         'No',
         async () => {
-          appointment.verified = true;
+          appointment.accepted = true;
           await appointmentsService.updateAppointment(id, appointment).then(() => {
             const updatedAppointments = appointments.map((a) =>
-              a._id === id ? { ...a, verified: true } : a
+              a._id === id ? { ...a, accepted: true } : a
             );
             setAppointments(updatedAppointments);
             Notiflix.Report.success(
@@ -75,10 +76,10 @@ const Appointments = () => {
         'Yes',
         'No',
         async () => {
-          appointment.verified = false;
+          appointment.accepted = false;
           await appointmentsService.updateAppointment(id, appointment).then(() => {
             const updatedAppointments = appointments.map((a) =>
-              a._id === id ? { ...a, verified: false } : a
+              a._id === id ? { ...a, accepted: false } : a
             );
             setAppointments(updatedAppointments);
             Notiflix.Report.success(
@@ -105,7 +106,7 @@ const Appointments = () => {
           setUser(data);
         })
       } else if(role=="Doctor") {
-        await doctorsService.getDoctor(id).then((data) => {
+        await doctorsService.getDoctor(name).then((data) => {
           console.log(data);
           setUser(data);
         })
@@ -209,11 +210,11 @@ const Appointments = () => {
                           {appointment.day} - {appointment.timeperiod}
                         </td>
                         <td className="border p-2">
-                          <b>{appointment.selectedTime}</b>
+                          <b>{appointment.timeperiod}</b>
                           <br></br>
                           <small>{(new Date(appointment.date)).toLocaleDateString()}</small>
                         </td>
-                        <td className="border p-2">{appointment.verified?'Approved':'Not Approved'}</td>
+                        <td className="border p-2">{appointment.accepted?'Approved':'Not Approved'}</td>
                         {(role==='Doctor'||role==='Patient')&&<td className="border p-2 flex items-center justify-center">
                             {appointment.accepted === false && (
                             <>
