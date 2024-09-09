@@ -18,7 +18,7 @@ class UserService {
                 success = true;
                 // Load Session
                 localStorage.setItem('username', username);
-                localStorage.setItem('name', response.data.name || response.data.namefullName);
+                localStorage.setItem('name', response.data.name || response.data.fullName);
                 localStorage.setItem('role', response.data.role);
                 localStorage.setItem('id', response.data._id);
                 localStorage.setItem('avatar', response.data.avatar||'https://cdn-icons-png.flaticon.com/512/1533/1533506.png');
