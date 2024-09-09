@@ -2,7 +2,7 @@ import axios from 'axios';
 import {handleErrors} from './error_handling';
 import varaiables from '../assets/data/env';
 
-const path = varaiables.SERVER_URL + "/api/appointments";
+const path = varaiables.SERVER_URL + "/api/sessions";
 var appointment_list = [];
 
 class AppointmentsService {
@@ -56,7 +56,7 @@ class AppointmentsService {
 
     async getAppointment(id){
         var obj = null;
-        await axios.get(`${path}/${id}`).then((response)=>{
+        await axios.get(`${path}/find/${id}`).then((response)=>{
             
             obj =  response.data;
             console.log(obj);
