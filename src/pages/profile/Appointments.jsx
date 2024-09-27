@@ -202,9 +202,9 @@ const Appointments = () => {
                     {appointments.length>0&&appointments.map((appointment) => (
                         <tr key={appointment._id}>
                         <td className="border p-2">
-                          <b>{appointment.userName}</b>
+                          <b>Session: {appointment._id}</b>
                           <br></br>
-                          <Link to={'/profile/medicalbook/'+appointment.patient}><small>{appointment.patient}</small></Link>
+                          <Link to={'/profile/medicalbook/'+appointment.patient+'/'+appointment._id}><small>{appointment.patient}</small></Link>
                         </td>
                         <td className="border p-2">
                           {appointment.day} - {appointment.timeperiod}

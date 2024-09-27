@@ -2,14 +2,16 @@ import { UserCircleIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 import doctorsService from '../../services/doctors.service';
 import patientsService from '../../services/patients.service';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import appointmentsService from '../../services/appointments.service';
 import Notiflix from 'notiflix';
 import recordsService from '../../services/records.service';
-import { AiFillEye, AiOutlineDownload } from 'react-icons/ai'
+import { AiFillEye, AiOutlineDownload,  AiOutlineAudio, AiOutlineFileText } from 'react-icons/ai'
+import messagesService from '../../services/messages.service';
 
 const MedicalRecords = () => {
-    const { patient } = useParams();
+    const { patient, session } = useParams();
+    const navigate = useNavigate();
   const [username, setUsername] = useState(localStorage.getItem('username'));
   const [role, setRole] = useState(localStorage.getItem('role'));
   const [id, setID] = useState(localStorage.getItem('id'));
@@ -19,9 +21,10 @@ const MedicalRecords = () => {
   const [renderedRecordIds, setRenderedRecordIds] = useState([]);
 
   const [prescriptions, setPrescriptions] = useState([]);
-  const [newMedication, setNewMedication] = useState('');
-  const [newDosage, setNewDosage] = useState('');
-  const [newInstructions, setNewInstructions] = useState('');
+  
+  const [newTitle, setNewTitle] = useState("");
+  const [newMessage, setNewMessage] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const [labReport, setLabReport] = useState(null);
 
@@ -259,8 +262,64 @@ const MedicalRecords = () => {
       
   }
 
+  const navigateToAudioRecords = () => {
+        navigate(`/profile/medicalbook/${session}/audio-records`);
+    };
+
+    const navigateToDocuments = () => {
+        navigate(`/profile/medicalbook/${session}/documents`);
+    };
+
+    const handleSubmit = async () => {
+      if (!newTitle || !newMessage) return;
+    
+      // Add the new message to the state
+      const newMessageData = {
+        title: newTitle,
+        message: newMessage,
+        sender: id, // Replace with actual sender ID
+        receiver: patient, // Replace with actual receiver ID
+      };
+    
+      console.log(newMessageData);
+    
+      try {
+        // Sending message to the API and updating state
+        await messagesService.createMessage(newMessageData).then(() => {
+          setMessages([...messages, newMessageData]);
+    
+          // Show success notification
+          Notiflix.Notify.success('Message sent successfully!');
+        });
+    
+        // Clear the input fields
+        setNewTitle("");
+        setNewMessage("");
+      } catch (error) {
+        // Handle error and show error notification if needed
+        Notiflix.Notify.failure('Failed to send message, please try again.');
+        console.error("Error sending message:", error);
+      }
+    };
+
+    const getMessagesByReceiver = async (patient) => {
+      if(patient){
+          await messagesService.getMessagesByReceiver(patient).then((data) => {
+            setMessages(data)
+          })
+      }
+      
+    };
+
+    const extractInstructions = (message) => {
+      const instructionPattern = /!(.*?)!/g;
+      const instructions = [...message.matchAll(instructionPattern)];
+      return instructions.map((match) => match[1]); // Extract the instructions inside '!'
+    };
+
   useEffect(() => {
       loadResources(id);
+      getMessagesByReceiver(patient)
   }, [])
 
   return (
@@ -300,66 +359,70 @@ const MedicalRecords = () => {
           <li>Phone: {user.contact}</li>
         </ul>
         <br></br>
+        <hr className="my-4 border-gray-300" />
+
+        {/* Row of Icons (Audio Records, Documents) */}
+        <div className="flex space-x-4 mb-6">
+            {/* Card for Audio Records */}
+            <div
+                className="flex items-center p-4 w-[250px] h-[80px] bg-white border rounded-lg shadow-md cursor-pointer"
+                onClick={navigateToAudioRecords}
+            >
+                {/* Icon */}
+                <AiOutlineAudio className="text-blue-500 text-3xl" />
+                {/* Text */}
+                <div className="ml-4 flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800">Audio Records</h3>
+                </div>
+            </div>
+
+            {/* Card for Documents */}
+            <div
+                className="flex items-center p-4 w-[250px] h-[80px] bg-white border rounded-lg shadow-md cursor-pointer"
+                onClick={navigateToDocuments}
+            >
+                {/* Icon */}
+                <AiOutlineFileText className="text-blue-500 text-3xl" />
+                {/* Text */}
+                <div className="ml-4 flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800">Documents</h3>
+                </div>
+            </div>
+        </div>
         <hr></hr>
         
-        {role&&role==='Doctor'&&<div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">Prescriptions</h2>
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">Send a Message</h2>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Medication</label>
+            <label className="block text-sm font-medium text-gray-700">Title</label>
             <input
               type="text"
               className="mt-1 p-2 w-full border rounded-md"
-              value={newMedication}
-              onChange={(e) => setNewMedication(e.target.value)}
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Dosage</label>
-            <input
-              type="text"
+            <label className="block text-sm font-medium text-gray-700">Message</label>
+            <textarea
               className="mt-1 p-2 w-full border rounded-md"
-              value={newDosage}
-              onChange={(e) => setNewDosage(e.target.value)}
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
             />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Instructions</label>
-            <input
-              type="text"
-              className="mt-1 p-2 w-full border rounded-md"
-              value={newInstructions}
-              onChange={(e) => setNewInstructions(e.target.value)}
-            />
+            <small>Provide instructions with '!' symbol and end with same symbol as well</small>
           </div>
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded"
             onClick={() => {
-              if(!newMedication||!newInstructions) return
-              // Add new prescription to the state
-              setPrescriptions([
-                ...prescriptions,
-                {
-                  medication: newMedication,
-                  dosage: newDosage,
-                  instructions: newInstructions,
-                },
-              ]);
+              if (!newTitle) return;
 
-              // Clear the input fields
-              setNewMedication('');
-              setNewDosage('');
-              setNewInstructions('');
+              handleSubmit()
             }}
           >
-            Add Prescription
+            Submit Message
           </button>
-          {prescriptions.length>0&&<button
-            className="bg-purple text-white px-4 py-2 m-2 rounded"
-            onClick={() => handleNewRecord()}
-        >
-            Create New Record
-        </button>}
-        </div>}
+        </div>
+
 
         <div className="mb-6">
           {prescriptions.length > 0 && (
@@ -391,138 +454,45 @@ const MedicalRecords = () => {
 
         <br></br>
 
-                <table className="w-full border-collapse">
-                    <thead>
-                    <tr>
-                        <th className="border p-2">Date</th>
-                        {role&&role!=='Patient'&&<th className="border p-2">Patient</th>}
-                        <th className="border p-2">Doctor's Observation / More Information</th>
-                        <th className="border p-2">Issued By</th>
-                        <th className="border p-2">Verified by Lab</th>
-                        <th className="border p-2">Medicines</th>
-                        {role&&role!=='Patient'&&<th className="border p-2">Actions</th>}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {appointments.length>0&&appointments.map((appointment) => {
-                      // if (renderedRecordIds.includes(appointment._id)) {
-                      //   console.log(appointment._id)
-                      //   console.log(renderedRecordIds);
-                      //   return null; // Skip rendering
-                      // } else {
-                      //   setRenderedRecordIds((prevIds) => [...prevIds, appointment._id]);
-                      // }
-                      // setRenderedRecordIds((prevIds) => [...prevIds, appointment._id]);
-
-                      return (
-                        <tr key={appointment._id}>
-                        <td className="border p-2">
-                          <b>{(new Date(appointment.createdAt)).toLocaleDateString()}</b>
-                          <br></br>
-                          <div className="flex flex-wrap">
-                          {appointment.images&&appointment.images.length>0&&appointment.images.map((item, index) => <div key={index} className="bg-gray-100 border border-solid border-color-secondary p-2 mr-2 mb-2 flex items-center rounded">
-                                  <p className="mr-2">
-                                    < AiFillEye/><b>{item.caption}</b>
-                                  </p>
-                                  <a
-                                    href={item.url} // Provide the URL of the file
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    download // Add the download attribute to enable downloading
-                                  >
-                                    <AiOutlineDownload />
-                                  </a>
-                                  
-                                </div>)}
-                          </div>
-                        </td>
-                        {role&&role!=='Patient'&&<td className="border p-2">
-                          <b>{appointment.userName}</b>
-                          <br></br>
-                          <small>{appointment.user}</small>
-                        </td>}
-                        <td className="border p-2">
-                          <p>{appointment.desc}</p>
-                          <br></br>
-                          <div className="flex flex-wrap">
-                              {appointment.prescriptions&&appointment.prescriptions.length>0&&appointment.prescriptions.map((prescription, index) => (
-                                <div key={index} className="bg-gray-100 border border-solid border-color-secondary p-2 mr-2 mb-2 flex items-center rounded">
-                                  <p className="mr-2">
-                                    <b>{prescription.medication}</b> | {prescription.dosage} <br></br><small>{prescription.instructions}</small>
-                                  </p>
-                                  
-                                </div>
-                              ))}
-                              
-                          </div>
-                          <div>
-                          {role&&role==='Lab Assistant'&&<div className="mb-6">
-                                <hr></hr>
-                                <h2 className="text-lg font-semibold text-gray-900">Lab Report</h2>
-                                <div className="mb-4">
-                                  <label className="block text-sm font-medium text-gray-700">Upload Report as Elecctronic Copy</label>
-                                  <input
-                                    type="file"
-                                    className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-blue-500"
-                                    onChange={(e) => setLabReport(e.target.files)}
-                                  />
-                                </div>
-                                <button
-                                  className="bg-purple text-white px-4 py-2 m-2 rounded"
-                                  onClick={() => handleLabReportUpload(appointment._id, appointment)}
-                                >
-                                  Add Lab Report
-                                </button>
-                              </div>}
-                          </div>
-                        </td>
-                        <td className="border p-2">
-                          <b>{appointment.issuedByName}</b>
-                          <br></br>
-                          <small>{appointment.issuedBy}</small>
-                        </td>
-                        <td className="border p-2">{appointment.verified?'Verified':'Not Verified'}</td>
-                        <td className="border p-2">{appointment.served?'Served':'Not Served'}</td>
-                        {role&&role==='Doctor'&&<td className="border p-2 flex items-center justify-center">
-                            <>
-                                <button
-                                className="bg-green text-white px-4 py-2 mr-2 rounded"
-                                onClick={() => handleUpdateRecord(appointment._id, appointment)}
-                                >
-                                Update
-                                </button>
-                                <button
-                                className="bg-red text-white px-4 py-2 rounded"
-                                onClick={() => handleRemoveRecords(appointment._id)}
-                                >
-                                Remove
-                                </button>
-                            </>
-                        </td>}
-                        {role&&role==='Lab Assistant'&&<td className="border p-2 flex items-center justify-center">
-                            <>
-                                <button
-                                className="bg-orange text-white px-4 py-2 mr-2 rounded"
-                                onClick={() => handleVerifyRecord(appointment._id, appointment)}
-                                >
-                                {appointment.verified?'Not Verify':'Verify'}
-                                </button>
-                            </>
-                        </td>}
-                        {role&&role==='Pharmacist'&&<td className="border p-2 flex items-center justify-center">
-                            <>
-                                <button
-                                className="bg-orange text-white px-4 py-2 mr-2 rounded"
-                                onClick={() => handleServedRecord(appointment._id, appointment)}
-                                >
-                                {appointment.served?'Not Served':'Served'}
-                                </button>
-                            </>
-                        </td>}
-                        </tr>
-                    );})}
-                    </tbody>
-                </table>
+        {messages.length > 0 && (
+        <table className="w-full border-collapse mt-4">
+          <thead>
+            <tr>
+              <th className="border p-2">Date</th>
+              <th className="border p-2">Title</th>
+              <th className="border p-2">Message</th>
+              <th className="border p-2">Instructions</th>
+              <th className="border p-2">Sender</th>
+              <th className="border p-2">Receiver</th>
+            </tr>
+          </thead>
+          <tbody>
+            {messages.map((msg, index) => {
+              const instructions = extractInstructions(msg.message); // Extract instructions
+              return (
+                <tr key={index}>
+                  <td className="border p-2">{new Date().toLocaleDateString()}</td>
+                  <td className="border p-2">{msg.title}</td>
+                  <td className="border p-2">{msg.message}</td>
+                  <td className="border p-2">
+                    {instructions.length > 0 ? (
+                      <ul className="list-disc list-inside">
+                        {instructions.map((instruction, idx) => (
+                          <li key={idx}>{instruction}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      "No instructions"
+                    )}
+                  </td>
+                  <td className="border p-2">{msg.sender}</td>
+                  <td className="border p-2">{msg.receiver}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}    
       </div>
 
       
