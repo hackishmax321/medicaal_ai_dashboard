@@ -1,5 +1,5 @@
 const varaiables = {
-    SERVER_URL: 'http://localhost:5000'
+    SERVER_URL: 'https://medical-ai-backend.onrender.com'
 }
 
 export default varaiables

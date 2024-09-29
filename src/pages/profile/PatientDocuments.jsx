@@ -31,15 +31,15 @@ const PatientDocuments = () => {
   }, [patient]);
 
   const handlePreview = (doc) => {
-    if (!doc.url) {
+    if (!doc.file_path) {
       setError('Document URL is missing or invalid.');
       Notiflix.Notify.failure('Document URL is missing or invalid.');
       return;
     }
 
-    const fileExtension = doc.url.split('.').pop().toLowerCase();
+    const fileExtension = doc.file_path.split('.').pop().toLowerCase();
     if (fileExtension === 'pdf') {
-      window.open(doc.url, '_blank');
+      window.open(doc.file_path, '_blank');
     } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
       setSelectedDoc(doc);
       setError('');
@@ -107,29 +107,58 @@ const PatientDocuments = () => {
             documents.map((doc, index) => (
               <div
                 key={index}
-                className="flex items-center p-4 bg-white border rounded-lg shadow-md"
+                className="flex flex-col p-4 bg-white border rounded-lg shadow-md"
               >
-                <AiOutlineFileText className="text-blue-500 text-3xl" />
-                <div className="ml-4 flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800">{doc.title}</h3>
-                  <p className="text-sm text-gray-600">{doc.description}</p>
+                <div className="flex items-center mb-4">
+                  <AiOutlineFileText className="text-blue-500 text-3xl" />
+                  <div className="ml-4 flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800">{doc.title}</h3>
+                    <p className="text-sm text-gray-600">{doc.description}</p>
+                  </div>
+                  <div className="ml-4 flex items-center space-x-2">
+                    <a
+                      href={doc.file_path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-700"
+                      download
+                    >
+                      <AiOutlineDownload className="text-2xl" />
+                    </a>
+                    <button
+                      onClick={() => handlePreview(doc)}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      <AiFillEye className="text-2xl" />
+                    </button>
+                  </div>
                 </div>
-                <div className="ml-4 flex items-center space-x-2">
-                  <a
-                    href={doc.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:text-blue-700"
-                    download
-                  >
-                    <AiOutlineDownload className="text-2xl" />
-                  </a>
-                  <button
-                    onClick={() => handlePreview(doc)}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    <AiFillEye className="text-2xl" />
-                  </button>
+
+                <div className="mt-2 p-2 bg-gray-100 rounded-lg">
+                  <div className="text-sm font-semibold text-gray-700">Keywords:</div>
+                  <p className="text-sm text-gray-600">
+                    {doc.keywords && doc.keywords.length > 0 ? doc.keywords.join(', ') : 'No keywords available'}
+                  </p>
+                </div>
+                <div className="mt-2 p-2 bg-gray-100 rounded-lg">
+                  <div className="text-sm font-semibold text-gray-700">Patient Info:</div>
+                  <p className="text-sm text-gray-600">
+                    {doc.patient_info || 'No patient info available'}
+                  </p>
+                </div>
+                <div className="mt-2 p-2 bg-gray-100 rounded-lg">
+                  <div className="text-sm font-semibold text-gray-700">Recommended Treatments:</div>
+                  <ul className="text-sm text-gray-600">
+                    {doc.recommendations && doc.recommendations.length > 0 ? (
+                      doc.recommendations.slice(0, 3).map((rec, idx) => (
+                        <li key={idx} className="mb-1">
+                          {rec[0]}: {rec[1]}
+                        </li>
+                      ))
+                    ) : (
+                      <li>No recommendations available</li>
+                    )}
+                  </ul>
                 </div>
               </div>
             ))
