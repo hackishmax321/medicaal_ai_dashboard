@@ -15,6 +15,7 @@ import AppointmentForm from '../pages/AppointmentForm'
 import MedicalRecords from '../pages/profile/MedicalRecords'
 import Users from '../pages/profile/Users'
 import PatientDocuments from '../pages/profile/PatientDocuments'
+import ChatSessions from '../pages/profile/ChatSessions'
 
 function NotFound() {
   return (
@@ -50,6 +51,7 @@ function Routings() {
             <Route path='medicalbook/:patient' element={<MedicalRecords/>}/>
             <Route path='medicalbook/:patient/:session' element={<MedicalRecords/>}/>
             <Route path='medicalbook/:patient/documents' element={<PatientDocuments/>}/>
+            <Route path='medicalbook/:patient/sessions' element={<ChatSessions/>}/>
             <Route path='medicalbook/:patient/audio' element={<PatientDocuments/>}/>
         </Route>
         <Route path='*' element={<NotFound />} />

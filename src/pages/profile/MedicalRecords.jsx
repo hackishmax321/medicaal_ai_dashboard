@@ -6,7 +6,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import appointmentsService from '../../services/appointments.service';
 import Notiflix from 'notiflix';
 import recordsService from '../../services/records.service';
-import { AiFillEye, AiOutlineDownload,  AiOutlineAudio, AiOutlineFileText } from 'react-icons/ai'
+import { AiFillEye, AiOutlineDownload,  AiOutlineAudio, AiOutlineFileText, AiFillWechat } from 'react-icons/ai'
 import messagesService from '../../services/messages.service';
 
 const MedicalRecords = () => {
@@ -262,12 +262,16 @@ const MedicalRecords = () => {
       
   }
 
-  const navigateToAudioRecords = () => {
+    const navigateToAudioRecords = () => {
         navigate(`/profile/medicalbook/${session}/audio-records`);
     };
 
     const navigateToDocuments = () => {
         navigate(`/profile/medicalbook/${session}/documents`);
+    };
+
+    const navigateToChat = () => {
+        navigate(`/profile/medicalbook/${patient}/sessions`);
     };
 
     const handleSubmit = async () => {
@@ -364,6 +368,17 @@ const MedicalRecords = () => {
         {/* Row of Icons (Audio Records, Documents) */}
         <div className="flex space-x-4 mb-6">
             {/* Card for Audio Records */}
+            <div
+                className="flex items-center p-4 w-[250px] h-[80px] bg-white border rounded-lg shadow-md cursor-pointer"
+                onClick={navigateToChat}
+            >
+                {/* Icon */}
+                <AiFillWechat className="text-blue-500 text-3xl" />
+                {/* Text */}
+                <div className="ml-4 flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800">Chat Sessions</h3>
+                </div>
+            </div>
             <div
                 className="flex items-center p-4 w-[250px] h-[80px] bg-white border rounded-lg shadow-md cursor-pointer"
                 onClick={navigateToAudioRecords}
