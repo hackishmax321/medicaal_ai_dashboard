@@ -38,6 +38,16 @@ class ChatSessionService {
         return session_list;
     }
 
+    async getSessionsByNameOnlyRelate(name, doctor) {
+        session_list = [];
+        await axios.get(`${path}/name/${name}`).then((response) => {
+            response.data.forEach(session => {
+                session_list.push(session);
+            });
+        }).catch(handleErrors);
+        return session_list;
+    }
+
     // Get chat sessions with keyword summary
     async getSessionsWithKeywordSummary() {
         session_list = [];

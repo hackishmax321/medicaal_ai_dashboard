@@ -6,7 +6,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import appointmentsService from '../../services/appointments.service';
 import Notiflix from 'notiflix';
 import recordsService from '../../services/records.service';
-import { AiFillEye, AiOutlineDownload,  AiOutlineAudio, AiOutlineFileText, AiFillWechat } from 'react-icons/ai'
+import { AiFillEye, AiFillRedEnvelope,  AiOutlineAudio, AiOutlineFileText, AiFillWechat } from 'react-icons/ai'
 import messagesService from '../../services/messages.service';
 
 const MedicalRecords = () => {
@@ -263,7 +263,7 @@ const MedicalRecords = () => {
   }
 
     const navigateToAudioRecords = () => {
-        navigate(`/profile/medicalbook/${session}/audio-records`);
+        navigate(`/profile/medicalbook/${patient}/game`);
     };
 
     const navigateToDocuments = () => {
@@ -384,10 +384,10 @@ const MedicalRecords = () => {
                 onClick={navigateToAudioRecords}
             >
                 {/* Icon */}
-                <AiOutlineAudio className="text-blue-500 text-3xl" />
+                <AiFillRedEnvelope className="text-blue-500 text-3xl" />
                 {/* Text */}
                 <div className="ml-4 flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800">Audio Records</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">Game Records</h3>
                 </div>
             </div>
 

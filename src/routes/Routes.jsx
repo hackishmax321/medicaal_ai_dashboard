@@ -16,6 +16,7 @@ import MedicalRecords from '../pages/profile/MedicalRecords'
 import Users from '../pages/profile/Users'
 import PatientDocuments from '../pages/profile/PatientDocuments'
 import ChatSessions from '../pages/profile/ChatSessions'
+import GameRecords from '../pages/profile/GameRecords'
 
 function NotFound() {
   return (
@@ -53,6 +54,7 @@ function Routings() {
             <Route path='medicalbook/:patient/documents' element={<PatientDocuments/>}/>
             <Route path='medicalbook/:patient/sessions' element={<ChatSessions/>}/>
             <Route path='medicalbook/:patient/audio' element={<PatientDocuments/>}/>
+            <Route path='medicalbook/:patient/game' element={<GameRecords/>}/>
         </Route>
         <Route path='*' element={<NotFound />} />
         
